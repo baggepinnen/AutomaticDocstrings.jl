@@ -13,14 +13,14 @@ end
 When you execute the macro, e.g. by ctrl-enter in Juno, the macro is replaced by a docstring
 ```julia
 """
-    function f(x::A, b=5; c=LinRange(1,2,10)) where A
+    f(x::A, b=5; c=LinRange(1,2,10)) where A
 
 FUNCTION DESCRIPTION
 
 #Arguments:
-- `x`: Description
-- `b`: Description
-- `c`: Description
+- `x`: DESCRIPTION
+- `b`: DESCRIPTION
+- `c`: DESCRIPTION
 """
 function f(x::A, b=5; c=LinRange(1,2,10)) where A
     5
@@ -33,4 +33,6 @@ Before modifying your file, a backup is saved.
 If you don't like the docstring or if something went wrong, ctrl-z (undo) works fine as well.
 
 # Limitations
-Currently, only single-line function definitions are supported.
+- If a file with multiple `@autodoc` are `include`ed, then only the first will be executed and then an error is thrown. Instead of `include(file)` call `autodoc(file)`.
+- Make sure the file is saved before you try to generate any docstrings.
+- Short-form function definitions with `where`, e.g., `f(a::A) where A`, does not work.
