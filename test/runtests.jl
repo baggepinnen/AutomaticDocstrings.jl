@@ -1,10 +1,18 @@
 using Test, AutomaticDocstrings
 
 function testdoc(input, output)
+    # Test function autodoc
     path, io = mktemp()
     write(io, input)
     close(io)
     autodoc(path)
+    result = reduce(*, readlines(path, keep=true))
+    occursin(output, result) || return false
+
+    # Test macro @autodoc
+    write(io, input)
+    close(io)
+    include(path)
     result = reduce(*, readlines(path, keep=true))
     occursin(output, result)
 end
