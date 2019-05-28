@@ -4,6 +4,9 @@
 
 This small package automatically generates docstring stubs for you to fill in.
 
+Install using `import Pkg; Pkg.add("AutomaticDocstrings")`
+
+# Usage
 Place the macro call `@autodoc` above the function that you want to generate a docstring for:
 ```julia
 using AutomaticDocstrings
