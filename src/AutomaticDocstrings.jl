@@ -1,6 +1,15 @@
 module AutomaticDocstrings
 using CSTParser
-export @autodoc, autodoc
+export @autodoc, autodoc, restore_defaults
+
+options = Dict(
+:min_args => 3, # Minimum number of arguments to print the argument list
+:args_header => "#Arguments:", # Printed above the argument list
+:full_def => true # Include the full function signature, if false, only include function and argument name
+)
+
+const DEFAULT_OPTIONS = copy(options)
+restore_defaults() = (global options = copy(DEFAULT_OPTIONS))
 
 macro autodoc()
     quote
@@ -59,9 +68,15 @@ function get_args(parseddef)
 end
 
 function build_docstring(fundef, argnames)
-    str = "\"\"\"\n    $fundef\n\nFUNCTION DESCRIPTION\n"
-    if !isempty(argnames)
-        str = string(str, "\n#Arguments:\n")
+    if options[:full_def]
+        str = "\"\"\"\n    $fundef\n\nFUNCTION DESCRIPTION\n"
+    else
+        funname = split(fundef, '(')[1]
+        argstring = replace(string((string.(argnames)...,)), '"'=>"")
+        str = "\"\"\"\n    $(funname)$(argstring)\n\nFUNCTION DESCRIPTION\n"
+    end
+    if !isempty(argnames) && length(argnames) >= options[:min_args]
+        str = string(str, "\n$(options[:args_header])\n")
         for argname in argnames
             argstr = "- `$argname`: DESCRIPTION\n"
             str = string(str, argstr)

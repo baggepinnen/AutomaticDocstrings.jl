@@ -39,3 +39,12 @@ If you don't like the docstring or if something went wrong, ctrl-z (undo) works 
 - If a file with multiple `@autodoc` are `include`ed, then only the first will be executed and then an error is thrown. Instead of `include(file)` call `autodoc(file)`.
 - Make sure the file is saved before you try to generate any docstrings.
 - Short-form function definitions with `where`, e.g., `f(a::A) where A`, does not work.
+
+# Options
+You may modify the `AutomaticDocstrings.options::Dict` to change some default values:
+```julia
+:min_args => 3 # Minimum number of arguments to print the argument list
+:args_header => "Arguments:" # Printed above the argument list
+:full_def => true # Include the full function signature, if false, only include function and argument names
+```
+You can always call `restore_defaults()` to restore the default options.
