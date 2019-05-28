@@ -1,7 +1,7 @@
 name = "AutomaticDocstrings"
 uuid = "70b36510-7dee-11e9-28d4-77afe9445f67"
 authors = ["Fredrik Bagge Carlson <cont-frb@ulund.org>"]
-version = "0.1.0"
+version = "0.1.1"
 
 [deps]
 CSTParser = "00ebfdb7-1f24-5e51-bd34-a7502290713f"
