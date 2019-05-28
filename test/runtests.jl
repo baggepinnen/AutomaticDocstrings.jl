@@ -7,7 +7,15 @@ function testdoc(input, output)
     close(io)
     autodoc(path)
     result = reduce(*, readlines(path, keep=true))
-    occursin(output, result) || return false
+    if !occursin(output, result)
+        println("Autodoc failed, input:   =====================================")
+        println(input)
+        println("Result:     ==================================================")
+        println(result)
+        println("Expected:   ==================================================")
+        println(output)
+        return false
+    end
 
     # Test macro @autodoc
     write(io, input)
@@ -16,6 +24,8 @@ function testdoc(input, output)
     result = reduce(*, readlines(path, keep=true))
     occursin(output, result)
 end
+
+restore_defaults()
 
 @test testdoc(
 """
@@ -27,7 +37,7 @@ end
 \"\"\"
     f(a, b; c)
 
-FUNCTION DESCRIPTION
+DOCSTRING
 
 #Arguments:
 - `a`: DESCRIPTION
@@ -51,7 +61,7 @@ end
 \"\"\"
     f(a, b; c)
 
-FUNCTION DESCRIPTION
+DOCSTRING
 
 #Arguments:
 - `a`: DESCRIPTION
@@ -74,7 +84,7 @@ f(a::A, b; c) where A = 5
 \"\"\"
 f(a, b; c) where A
 
-FUNCTION DESCRIPTION
+DOCSTRING
 
 #Arguments:
 - `a`: DESCRIPTION
@@ -96,7 +106,7 @@ end
 \"\"\"
     f(a::A, b; c) where A
 
-FUNCTION DESCRIPTION
+DOCSTRING
 
 #Arguments:
 - `a`: DESCRIPTION
@@ -123,7 +133,7 @@ end
 \"\"\"
     f(a, b, c)
 
-FUNCTION DESCRIPTION
+DOCSTRING
 
 #Arguments:
 - `a`: DESCRIPTION
@@ -147,7 +157,7 @@ end
 \"\"\"
     f(a, b)
 
-FUNCTION DESCRIPTION
+DOCSTRING
 \"\"\"
 function f(a=4, b=LinRange(1,2,3))
 end
@@ -157,3 +167,65 @@ end
 
 restore_defaults()
 @test AutomaticDocstrings.options[:full_def]
+
+# Struct
+
+@test testdoc(
+"""
+@autodoc
+struct Workspace{T1,T2,T3,T4,T5,T6}
+    simple_input::T1
+    simple_result::T2
+    result::T3
+    buffersetter::T4
+    resultsetter::T5
+    f::T6
+    N::Int
+end
+""",
+"""
+\"\"\"
+    struct Workspace{T1, T2, T3, T4, T5, T6}
+
+DOCSTRING
+
+#Arguments:
+- `simple_input`: DESCRIPTION
+- `simple_result`: DESCRIPTION
+- `result`: DESCRIPTION
+- `buffersetter`: DESCRIPTION
+- `resultsetter`: DESCRIPTION
+- `f`: DESCRIPTION
+- `N`: DESCRIPTION
+\"\"\"
+struct Workspace{T1,T2,T3,T4,T5,T6}
+    simple_input::T1
+    simple_result::T2
+    result::T3
+    buffersetter::T4
+    resultsetter::T5
+    f::T6
+    N::Int
+end
+""")
+
+
+
+
+
+
+using CSTParser
+
+tests = "struct Workspace{T1,T2,T3,T4,T5,T6}
+    simple_input::T1
+    simple_result::T2
+    result::T3
+    buffersetter::T4
+    resultsetter::T5
+    f::T6
+    N::Int
+end"
+
+parseddef = CSTParser.parse(tests)
+args = CSTParser.get_args(parseddef)
+argnames = CSTParser.str_value.(args)

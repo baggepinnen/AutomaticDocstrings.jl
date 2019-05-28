@@ -8,8 +8,10 @@ options = Dict(
 :full_def => true # Include the full function signature, if false, only include function and argument name
 )
 
-const DEFAULT_OPTIONS = copy(options)
-restore_defaults() = (global options = copy(DEFAULT_OPTIONS))
+const DEFAULT_OPTIONS = deepcopy(options)
+function restore_defaults()
+    global options = deepcopy(DEFAULT_OPTIONS)
+end
 
 macro autodoc()
     quote
@@ -54,12 +56,15 @@ end
 function get_function_definition(file,li)
     lines = readlines(file, keep=true)
     alllines = reduce(*, lines[li+1:end])
-    CSTParser.defines_function(CSTParser.parse(alllines)) || error("I did not find a function definition. Place `@autodoc` right above a function definition. Line number: $li")
+    parsedlines = CSTParser.parse(alllines)
+    CSTParser.defines_function(parsedlines) ||
+        CSTParser.defines_struct(parsedlines) ||
+        error("I did not find a function or struct definition. Place `@autodoc` right above a function or struct definition. Line number: $li")
     fundef = Meta.parse(alllines,1)[1]
     fundef = String(split(string(fundef), '\n')[1])
     parseddef = CSTParser.parse(fundef)
     fundef = strip_function_keyword(fundef)
-    fundef, parseddef
+    fundef, parsedlines
 end
 
 function get_args(parseddef)
@@ -69,11 +74,11 @@ end
 
 function build_docstring(fundef, argnames)
     if options[:full_def]
-        str = "\"\"\"\n    $fundef\n\nFUNCTION DESCRIPTION\n"
+        str = "\"\"\"\n    $fundef\n\nDOCSTRING\n"
     else
         funname = split(fundef, '(')[1]
         argstring = replace(string((string.(argnames)...,)), '"'=>"")
-        str = "\"\"\"\n    $(funname)$(argstring)\n\nFUNCTION DESCRIPTION\n"
+        str = "\"\"\"\n    $(funname)$(argstring)\n\nDOCSTRING\n"
     end
     if !isempty(argnames) && length(argnames) >= options[:min_args]
         str = string(str, "\n$(options[:args_header])\n")

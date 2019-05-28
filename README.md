@@ -7,7 +7,7 @@ This small package automatically generates docstring stubs for you to fill in.
 Install using `import Pkg; Pkg.add("AutomaticDocstrings")`
 
 # Usage
-Place the macro call `@autodoc` above the function that you want to generate a docstring for:
+Place the macro call `@autodoc` above the function or struct definition that you want to generate a docstring for:
 ```julia
 using AutomaticDocstrings
 
@@ -21,7 +21,7 @@ When you execute the macro, e.g. by ctrl-enter in Juno, the macro is replaced by
 """
     f(x::A, b=5; c=LinRange(1,2,10)) where A
 
-FUNCTION DESCRIPTION
+DOCSTRING
 
 #Arguments:
 - `x`: DESCRIPTION
