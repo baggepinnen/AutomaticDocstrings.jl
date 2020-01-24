@@ -228,4 +228,4 @@ end"
 
 parseddef = CSTParser.parse(tests)
 args = CSTParser.get_args(parseddef)
-argnames = CSTParser.str_value.(args)
+@test argnames = CSTParser.str_value.(args) == [ "simple_input", "simple_result", "result", "buffersetter" , "resultsetter" , "f" , "N" ]
