@@ -4,7 +4,7 @@ export @autodoc, autodoc, restore_defaults
 
 options = Dict(
 :min_args => 3, # Minimum number of arguments to print the argument list
-:args_header => "#Arguments:", # Printed above the argument list
+:args_header => "# Arguments:", # Printed above the argument list
 :full_def => true # Include the full function signature, if false, only include function and argument name
 )
 
