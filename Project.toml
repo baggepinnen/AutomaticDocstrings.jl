@@ -6,11 +6,12 @@ version = "0.1.1"
 [deps]
 CSTParser = "00ebfdb7-1f24-5e51-bd34-a7502290713f"
 
-[extras]
-Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
-
 [compat]
 julia = "1.0"
 
+[extras]
+DeepDiffs = "ab62b9b5-e342-54a8-a765-a90f495de1a6"
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
 [targets]
-test = ["Test"]
+test = ["DeepDiffs", "Test"]

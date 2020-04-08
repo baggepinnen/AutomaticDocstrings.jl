@@ -1,4 +1,4 @@
-using Test, AutomaticDocstrings
+using Test, AutomaticDocstrings, DeepDiffs
 
 function testdoc(input, output)
     # Test function autodoc
@@ -10,10 +10,12 @@ function testdoc(input, output)
     if !occursin(output, result)
         println("Autodoc failed, input:   =====================================")
         println(input)
-        println("Result:     ==================================================")
-        println(result)
-        println("Expected:   ==================================================")
-        println(output)
+        # println("Result:     ==================================================")
+        # println(result)
+        # println("Expected:   ==================================================")
+        # println(output)
+        println("Diff:       ==================================================")
+        println(deepdiff(output, result))
         return false
     end
 
@@ -209,6 +211,46 @@ struct Workspace{T1,T2,T3,T4,T5,T6}
 end
 """)
 
+import Base.@kwdef
+
+@test testdoc(
+"""
+@autodoc
+@kwdef struct Workspace{T1,T2,T3,T4,T5,T6}
+    simple_input::T1
+    simple_result::T2
+    result::T3
+    buffersetter::T4
+    resultsetter::T5
+    f::T6
+    N::Int = 2
+end
+""",
+"""
+\"\"\"
+    Workspace{T1, T2, T3, T4, T5, T6}
+
+DOCSTRING
+
+# Arguments:
+- `simple_input::T1`: DESCRIPTION
+- `simple_result::T2`: DESCRIPTION
+- `result::T3`: DESCRIPTION
+- `buffersetter::T4`: DESCRIPTION
+- `resultsetter::T5`: DESCRIPTION
+- `f::T6`: DESCRIPTION
+- `N::Int = 2`: DESCRIPTION
+\"\"\"
+@kwdef struct Workspace{T1,T2,T3,T4,T5,T6}
+    simple_input::T1
+    simple_result::T2
+    result::T3
+    buffersetter::T4
+    resultsetter::T5
+    f::T6
+    N::Int = 2
+end
+""")
 
 
 
