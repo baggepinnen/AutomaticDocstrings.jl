@@ -185,18 +185,18 @@ end
 """,
 """
 \"\"\"
-    struct Workspace{T1, T2, T3, T4, T5, T6}
+    Workspace{T1, T2, T3, T4, T5, T6}
 
 DOCSTRING
 
 # Arguments:
-- `simple_input`: DESCRIPTION
-- `simple_result`: DESCRIPTION
-- `result`: DESCRIPTION
-- `buffersetter`: DESCRIPTION
-- `resultsetter`: DESCRIPTION
-- `f`: DESCRIPTION
-- `N`: DESCRIPTION
+- `simple_input::T1`: DESCRIPTION
+- `simple_result::T2`: DESCRIPTION
+- `result::T3`: DESCRIPTION
+- `buffersetter::T4`: DESCRIPTION
+- `resultsetter::T5`: DESCRIPTION
+- `f::T6`: DESCRIPTION
+- `N::Int`: DESCRIPTION
 \"\"\"
 struct Workspace{T1,T2,T3,T4,T5,T6}
     simple_input::T1
