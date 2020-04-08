@@ -211,6 +211,7 @@ struct Workspace{T1,T2,T3,T4,T5,T6}
 end
 """)
 
+@static if VERSION >= v"1.3"
 import Base.@kwdef
 
 @test testdoc(
@@ -251,7 +252,7 @@ DOCSTRING
     N::Int = 2
 end
 """)
-
+end
 
 
 
