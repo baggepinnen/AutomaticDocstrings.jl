@@ -39,7 +39,7 @@ end
 
 DOCSTRING
 
-#Arguments:
+# Arguments:
 - `a`: DESCRIPTION
 - `b`: DESCRIPTION
 - `c`: DESCRIPTION
@@ -63,7 +63,7 @@ end
 
 DOCSTRING
 
-#Arguments:
+# Arguments:
 - `a`: DESCRIPTION
 - `b`: DESCRIPTION
 - `c`: DESCRIPTION
@@ -86,7 +86,7 @@ f(a, b; c) where A
 
 DOCSTRING
 
-#Arguments:
+# Arguments:
 - `a`: DESCRIPTION
 - `b`: DESCRIPTION
 - `c`: DESCRIPTION
@@ -108,7 +108,7 @@ end
 
 DOCSTRING
 
-#Arguments:
+# Arguments:
 - `a`: DESCRIPTION
 - `b`: DESCRIPTION
 - `c`: DESCRIPTION
@@ -135,7 +135,7 @@ end
 
 DOCSTRING
 
-#Arguments:
+# Arguments:
 - `a`: DESCRIPTION
 - `b`: DESCRIPTION
 - `c`: DESCRIPTION
@@ -189,7 +189,7 @@ end
 
 DOCSTRING
 
-#Arguments:
+# Arguments:
 - `simple_input`: DESCRIPTION
 - `simple_result`: DESCRIPTION
 - `result`: DESCRIPTION
