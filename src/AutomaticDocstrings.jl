@@ -4,7 +4,7 @@ export @autodoc, autodoc, restore_defaults
 
 options = Dict(
 :min_args => 3, # Minimum number of arguments to print the argument list
-:args_header => "#Arguments:", # Printed above the argument list
+:args_header => "# Arguments:", # Printed above the argument list
 :full_def => true # Include the full function signature, if false, only include function and argument name
 )
 
@@ -48,7 +48,7 @@ end
 
 function generate_docstring(file,li)
     fundef, parseddef = get_function_definition(file,li)
-    argnames = get_args(parseddef)
+    argnames = getfield.(CSTParser.get_args(parseddef), :val)
     build_docstring(fundef, argnames)
 end
 
