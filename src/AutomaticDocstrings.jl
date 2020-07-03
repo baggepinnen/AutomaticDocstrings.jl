@@ -77,7 +77,7 @@ function get_function_definition(file,li)
 end
 
 function get_args(parseddef)
-    args = CSTParser.get_args(parseddef)
+    args = CSTParser.get_args(parseddef) # old definition of get_args is copied from CSTParser below
     argnames = CSTParser.str_value.(args)
 end
 
@@ -124,3 +124,110 @@ function strip_function_keyword(fundef)
 end
 
 end # module
+
+
+# This is get_args from cst_parser before they removed it, might become useful
+# function get_args(x::EXPR)
+#     if isidentifier(x)
+#         return EXPR[]
+#     elseif defines_anon_function(x) && !(typof(x.args[1]) === TupleH)
+#         arg = x.args[1]
+#         arg = rem_invis(arg)
+#         arg = get_arg_name(arg)
+#         return [arg]
+#     elseif typof(x) === TupleH
+#         args = EXPR[]
+#         for i = 2:length(x.args)
+#             arg = x.args[i]
+#             ispunctuation(arg) && continue
+#             typof(arg) === Parameters && continue
+#             arg_name = get_arg_name(arg)
+#             push!(args, arg_name)
+#         end
+#         return args
+#     elseif typof(x) === Do
+#         args = EXPR[]
+#         for i = 1:length(x.args[3].args)
+#             arg = x.args[3].args[i]
+#             ispunctuation(arg) && continue
+#             typof(arg) === Parameters && continue
+#             arg_name = get_arg_name(arg)
+#             push!(args, arg_name)
+#         end
+#         return args
+#     elseif typof(x) === Call || typof(x) === MacroCall
+#
+#         args = EXPR[]
+#         sig = rem_where(x)
+#         sig = rem_decl(sig)
+#         if typof(sig) === Call || typof(x) === MacroCall
+#             for i = 2:length(sig.args)
+#                 arg = sig.args[i]
+#                 ispunctuation(arg) && continue
+#                 if typof(arg) === Parameters
+#                     append!(args, get_args(arg))
+#                 else
+#                     arg_name = get_arg_name(arg)
+#                     push!(args, arg_name)
+#                 end
+#             end
+#         else
+#             error("not sig: $sig")
+#         end
+#         return args
+#     elseif typof(x) === Parameters
+#         args = EXPR[]
+#         for i = 1:length(x.args)
+#             parg = x.args[i]
+#             ispunctuation(parg) && continue
+#             parg_name = get_arg_name(parg)
+#             push!(args, parg_name)
+#         end
+#         return args
+#     elseif typof(x) === Struct
+#         args = EXPR[]
+#         for arg in x.args[3]
+#             if !defines_function(arg)
+#                 arg = rem_decl(arg)
+#                 push!(args, arg)
+#             end
+#         end
+#         return args
+#     elseif typof(x) === Mutable
+#         args = EXPR[]
+#         for arg in x.args[4]
+#             if !defines_function(arg)
+#                 arg = rem_decl(arg)
+#                 push!(args, arg)
+#             end
+#         end
+#         return args
+#     elseif typof(x) === Flatten
+#         return get_args(x.args[1])
+#     elseif typof(x) === Generator || typof(x) === Flatten
+#         args = EXPR[]
+#         if typof(x.args[1]) === Flatten || typof(x.args[1]) === Generator
+#             append!(args, get_args(x.args[1]))
+#         end
+#
+#         if typof(x.args[3]) === Filter
+#             return get_args(x.args[3])
+#         else
+#             for i = 3:length(x.args)
+#                 arg = x.args[i]
+#                 if is_range(arg)
+#                     arg = rem_decl(arg.args[1])
+#                     arg = flatten_tuple(arg)
+#                     arg = rem_decl.(arg)
+#                     append!(args, arg)
+#                 end
+#             end
+#             return args
+#         end
+#     else
+#         sig = get_sig(x)
+#         sig = rem_where(sig)
+#         sig = rem_decl(sig)
+#         return get_args(sig)
+#     end
+# end
