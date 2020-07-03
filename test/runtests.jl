@@ -29,6 +29,10 @@ end
 
 restore_defaults()
 
+@testset "AutomaticDocstrings" begin
+    @info "Testing AutomaticDOcstrings"
+
+
 @test testdoc(
 """
 @autodoc
@@ -272,3 +276,5 @@ end"
 parseddef = CSTParser.parse(tests)
 args = CSTParser.get_args(parseddef)
 @test argnames = CSTParser.str_value.(args) == [ "simple_input", "simple_result", "result", "buffersetter" , "resultsetter" , "f" , "N" ]
+
+end

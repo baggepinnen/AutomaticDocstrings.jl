@@ -47,8 +47,7 @@ function autodoc(file)
 end
 
 function generate_docstring(file,li)
-    fundef, parseddef = get_function_definition(file,li)
-    argnames = getfield.(CSTParser.get_args(parseddef), :val)
+    fundef, argnames = get_function_definition(file,li)
     build_docstring(fundef, argnames)
 end
 
@@ -68,7 +67,7 @@ function get_function_definition(file,li)
     if kwdef || CSTParser.defines_struct(parsedlines)
         args = fundef.args[3].args
         args = filter(x->x isa Expr, args)
-        return string(fundef.args[2]), string.(args)
+        return (fundef.args[2]), (args)
     end
     fundef = String(split(string(fundef), '\n')[1])
     parseddef = CSTParser.parse(fundef)
