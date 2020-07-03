@@ -1,6 +1,5 @@
 # AutomaticDocstrings
-[![Build Status](https://travis-ci.org/baggepinnen/AutomaticDocstrings.jl.svg?branch=master)](https://travis-ci.org/baggepinnen/AutomaticDocstrings.jl)
-[![PkgEval](https://juliaci.github.io/NanosoldierReports/pkgeval_badges/A/AutomaticDocstrings.svg)](https://juliaci.github.io/NanosoldierReports/pkgeval_badges/report.html)
+[![CI](https://github.com/baggepinnen/AutomaticDocstrings.jl/workflows/CI/badge.svg)](https://github.com/baggepinnen/AutomaticDocstrings.jl/actions)
 [![codecov](https://codecov.io/gh/baggepinnen/AutomaticDocstrings.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/baggepinnen/AutomaticDocstrings.jl)
 
 This small package automatically generates docstring stubs for you to fill in.
