@@ -23,7 +23,7 @@ When you execute the macro, e.g. by ctrl-enter in Juno, the macro is replaced by
 
 DOCSTRING
 
-#Arguments:
+# Arguments:
 - `x`: DESCRIPTION
 - `b`: DESCRIPTION
 - `c`: DESCRIPTION
