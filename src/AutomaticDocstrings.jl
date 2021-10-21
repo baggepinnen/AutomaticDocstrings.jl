@@ -56,8 +56,12 @@ function get_function_definition(file,li)
     lines = readlines(file, keep=true)
     alllines = reduce(*, lines[li+1:end])
 
-    kwdef = occursin("@kwdef ", alllines[1:7])
-    kwdef && (alllines = alllines[8:end])
+    kwdef1 = occursin("@kwdef ", alllines[1:7])
+    kwdef2 = occursin("Base.@kwdef ", alllines[1:12])
+    kwdef1 && (alllines = alllines[8:end])
+    kwdef2 && (alllines = alllines[13:end])
+    kwdef = kwdef1 || kwdef2
+    
 
     parsedlines = CSTParser.parse(alllines)
     CSTParser.defines_function(parsedlines) ||
