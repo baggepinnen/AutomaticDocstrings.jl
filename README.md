@@ -19,7 +19,7 @@ end
 When you execute the macro, e.g. by ctrl-enter in Juno, the macro is replaced by a docstring
 ```julia
 """
-    f(x::A, b=5; c=LinRange(1,2,10)) where A
+    f(x::A, b=5; c=LinRange(1,2,10))
 
 DOCSTRING
 
@@ -41,7 +41,6 @@ If you don't like the docstring or if something went wrong, ctrl-z (undo) works 
 # Limitations
 - If a file with multiple `@autodoc` are `include`ed, then only the first will be executed and then an error is thrown. Instead of `include(file)` call `autodoc(file)`.
 - Make sure the file is saved before you try to generate any docstrings.
-- Short-form function definitions with `where`, e.g., `f(a::A) where A`, does not work.
 
 # Options
 You may modify the `AutomaticDocstrings.options::Dict` to change some default values:
