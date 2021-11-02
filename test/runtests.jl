@@ -81,14 +81,14 @@ end
 """)
 
 
-@test_broken testdoc(
+@test testdoc(
 """
 @autodoc
 f(a::A, b; c) where A = 5
 """,
 """
 \"\"\"
-f(a, b; c) where A
+    f(a::A, b; c)
 
 DOCSTRING
 
@@ -110,7 +110,7 @@ end
 """,
 """
 \"\"\"
-    f(a::A, b; c) where A
+    f(a::A, b; c)
 
 DOCSTRING
 
@@ -258,23 +258,5 @@ end
 """)
 end
 
-
-
-
-using CSTParser
-
-tests = "struct Workspace{T1,T2,T3,T4,T5,T6}
-    simple_input::T1
-    simple_result::T2
-    result::T3
-    buffersetter::T4
-    resultsetter::T5
-    f::T6
-    N::Int
-end"
-
-parseddef = CSTParser.parse(tests)
-args = CSTParser.get_args(parseddef)
-@test argnames = CSTParser.str_value.(args) == [ "simple_input", "simple_result", "result", "buffersetter" , "resultsetter" , "f" , "N" ]
 
 end

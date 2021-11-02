@@ -47,7 +47,7 @@ If you don't like the docstring or if something went wrong, ctrl-z (undo) works 
 You may modify the `AutomaticDocstrings.options::Dict` to change some default values:
 ```julia
 :min_args => 3 # Minimum number of arguments to print the argument list
-:args_header => "Arguments:" # Printed above the argument list
+:args_header => "# Arguments:" # Printed above the argument list
 :full_def => true # Include the full function signature, if false, only include function and argument names
 ```
 You can always call `restore_defaults()` to restore the default options.
