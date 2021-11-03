@@ -8,7 +8,7 @@ CSTParser = "00ebfdb7-1f24-5e51-bd34-a7502290713f"
 MacroTools = "1914dd2f-81c6-5fcd-8719-6d5c9610ff09"
 
 [compat]
-CSTParser = "2.5"
+CSTParser = "3.2"
 MacroTools = "0.5.9"
 julia = "1.0"
 
