@@ -77,6 +77,7 @@ function get_function_definition(file,li)
     end
     fundef = String(split(string(fundef0), '\n')[1])
     fundef = strip_function_keyword(fundef)
+    fundef = replace(fundef, "; )" => ")")
     argnames = get_args(fundef0)
     fundef, argnames
 end
