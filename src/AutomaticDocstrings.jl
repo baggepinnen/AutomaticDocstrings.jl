@@ -108,6 +108,9 @@ end
 
 function build_docstring(fundef, argnames, argtypes)
     if options[:full_def]
+        if options[:arg_types_in_desc] && !isnothing(argtypes)
+            fundef = replace(fundef, r"(::.+?)([,|=| =])" => s"\2")
+        end
         str = "\"\"\"\n    $fundef\n\nDOCSTRING\n"
     else
         funname = split(fundef, '(')[1]
