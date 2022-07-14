@@ -6,7 +6,8 @@ export @autodoc, autodoc, restore_defaults
 options = Dict(
 :min_args => 3, # Minimum number of arguments to print the argument list
 :args_header => "# Arguments:", # Printed above the argument list
-:full_def => true # Include the full function signature, if false, only include function and argument name
+:full_def => true, # Include the full function signature, if false, only include function and argument name
+:arg_types_in_desc => false, # Include the argument types in the description
 )
 
 const DEFAULT_OPTIONS = deepcopy(options)
@@ -48,8 +49,8 @@ function autodoc(file)
 end
 
 function generate_docstring(file,li)
-    fundef, argnames = get_function_definition(file,li)
-    build_docstring(fundef, argnames)
+    fundef, argnames, argtypes = get_function_definition(file,li)
+    build_docstring(fundef, argnames, argtypes)
 end
 
 
@@ -73,13 +74,13 @@ function get_function_definition(file,li)
     if kwdef || CSTParser.defines_struct(parsedlines)
         args = fundef0.args[3].args
         args = filter(x->x isa Expr, args)
-        return (fundef0.args[2]), (args)
+        return (fundef0.args[2]), (args), nothing
     end
     fundef = String(split(string(fundef0), '\n')[1])
     fundef = strip_function_keyword(fundef)
     fundef = replace(fundef, "; )" => ")")
-    argnames = get_args(fundef0)
-    fundef, argnames
+    argnames, argtypes = get_args(fundef0)
+    return fundef, argnames, argtypes
 end
 
 function rm_where(fundef)
@@ -95,17 +96,21 @@ end
 
 function get_args(fundef)
     sd = MacroTools.splitdef(fundef)
-    args = first.(MacroTools.splitarg.(sd[:args]))
-    kwargs = first.(MacroTools.splitarg.(sd[:kwargs]))
-    args = [
-            args
-            kwargs
-    ]
-    string.(args)
+    args = String[]
+    argtypes = String[]
+    for arg in vcat(sd[:args], sd[:kwargs])
+        (arg_name, arg_type, is_splat, default) = MacroTools.splitarg(arg)
+        push!(args, string(arg_name))
+        push!(argtypes, string(arg_type))
+    end
+    args, argtypes
 end
 
-function build_docstring(fundef, argnames)
+function build_docstring(fundef, argnames, argtypes)
     if options[:full_def]
+        if options[:arg_types_in_desc] && !isnothing(argtypes)
+            fundef = replace(fundef, r"(::.+?)([,|=| =])" => s"\2")
+        end
         str = "\"\"\"\n    $fundef\n\nDOCSTRING\n"
     else
         funname = split(fundef, '(')[1]
@@ -114,8 +119,12 @@ function build_docstring(fundef, argnames)
     end
     if !isempty(argnames) && length(argnames) >= options[:min_args]
         str = string(str, "\n$(options[:args_header])\n")
-        for argname in argnames
-            argstr = "- `$argname`: DESCRIPTION\n"
+        for (i, argname) in enumerate(argnames)
+            argstr = if options[:arg_types_in_desc] && !isnothing(argtypes) && argtypes[i] != "Any"
+                "- `$argname::$(argtypes[i])`: DESCRIPTION\n"
+            else
+                "- `$argname`: DESCRIPTION\n"
+            end
             str = string(str, argstr)
         end
     end

@@ -258,5 +258,31 @@ end
 """)
 end
 
+restore_defaults()
+AutomaticDocstrings.options[:arg_types_in_desc] = true
+
+@test testdoc(
+"""
+@autodoc
+function f(x::A, b=5; c = LinRange(1,2,10)) where A
+    5
+end
+""",
+"""
+\"\"\"
+    f(x, b = 5; c = LinRange(1, 2, 10))
+
+DOCSTRING
+
+# Arguments:
+- `x::A`: DESCRIPTION
+- `b`: DESCRIPTION
+- `c`: DESCRIPTION
+\"\"\"
+function f(x::A, b=5; c = LinRange(1,2,10)) where A
+    5
+end
+""")
+
 
 end
