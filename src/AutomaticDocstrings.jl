@@ -120,7 +120,7 @@ function build_docstring(fundef, argnames, argtypes)
     if !isempty(argnames) && length(argnames) >= options[:min_args]
         str = string(str, "\n$(options[:args_header])\n")
         for (i, argname) in enumerate(argnames)
-            argstr = if options[:arg_types_in_desc] && !isnothing(argtypes)
+            argstr = if options[:arg_types_in_desc] && !isnothing(argtypes) && argtypes[i] != "Any"
                 "- `$argname::$(argtypes[i])`: DESCRIPTION\n"
             else
                 "- `$argname`: DESCRIPTION\n"
