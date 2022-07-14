@@ -74,13 +74,13 @@ function get_function_definition(file,li)
     if kwdef || CSTParser.defines_struct(parsedlines)
         args = fundef0.args[3].args
         args = filter(x->x isa Expr, args)
-        return (fundef0.args[2]), (args)
+        return (fundef0.args[2]), (args), nothing
     end
     fundef = String(split(string(fundef0), '\n')[1])
     fundef = strip_function_keyword(fundef)
     fundef = replace(fundef, "; )" => ")")
     argnames, argtypes = get_args(fundef0)
-    fundef, argnames, argtypes
+    return fundef, argnames, argtypes
 end
 
 function rm_where(fundef)
@@ -116,9 +116,9 @@ function build_docstring(fundef, argnames, argtypes)
     end
     if !isempty(argnames) && length(argnames) >= options[:min_args]
         str = string(str, "\n$(options[:args_header])\n")
-        for (argname, argtype) in zip(argnames, argtypes)
-            argstr = if options[:arg_types_in_desc]
-                "- `$argname::$argtype`: DESCRIPTION\n"
+        for (i, argname) in enumerate(argnames)
+            argstr = if options[:arg_types_in_desc] && !isnothing(argtypes)
+                "- `$argname::$(argtypes[i])`: DESCRIPTION\n"
             else
                 "- `$argname`: DESCRIPTION\n"
             end
