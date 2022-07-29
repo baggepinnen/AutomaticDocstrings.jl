@@ -124,9 +124,8 @@ function f(a::A, b; c) where A
 end
 """)
 
-
-
-AutomaticDocstrings.options[:full_def] = false
+AutomaticDocstrings.options[:arg_types_in_header] = false
+AutomaticDocstrings.options[:defaults_in_header] = false
 
 
 @test testdoc(
@@ -172,7 +171,8 @@ end
 
 
 restore_defaults()
-@test AutomaticDocstrings.options[:full_def]
+@test AutomaticDocstrings.options[:arg_types_in_header]
+@test AutomaticDocstrings.options[:defaults_in_header]
 
 # Struct
 
@@ -260,6 +260,7 @@ end
 
 restore_defaults()
 AutomaticDocstrings.options[:arg_types_in_desc] = true
+AutomaticDocstrings.options[:arg_types_in_header] = false
 
 @test testdoc(
 """

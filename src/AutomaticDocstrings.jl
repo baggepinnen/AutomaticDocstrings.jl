@@ -8,9 +8,10 @@ options = Dict(
     :args_header => "# Arguments:", # Printed above the argument list
     :kwargs_header => nothing, # Printed above the keyword argument list
     :struct_fields_header => "# Fields:", # Printed above the fields list
-    :full_def => true, # Include the full function signature, if false, only include function and argument name
     :arg_types_in_desc => false, # Include the argument types in the description
     :defaults_in_desc => false, # Include the default values in the description
+    :arg_types_in_header => true, # Include the argument types in the function header
+    :defaults_in_header => true, # Include the default values in the function header
 )
 
 const DEFAULT_OPTIONS = deepcopy(options)
@@ -71,12 +72,12 @@ function getfunstr(fundef)
     str = "$(fundef[:name])("
     if !isempty(fundef[:args])
         str = str * (join(map(fundef[:args]) do f
-            get_arg_item_str(f, options[:full_def] && !options[:arg_types_in_desc], options[:full_def])
+            get_arg_item_str(f, options[:arg_types_in_header], options[:defaults_in_header])
         end,", "))
     end
     if !isempty(fundef[:kwargs])
         str = str * "; " * (join(map(fundef[:kwargs]) do f
-            get_arg_item_str(f, options[:full_def] && !options[:arg_types_in_desc], options[:full_def])
+            get_arg_item_str(f, options[:arg_types_in_header], options[:defaults_in_header])
         end,", ")) 
     end
     str = str * ")"

@@ -48,8 +48,9 @@ You may modify the `AutomaticDocstrings.options::Dict` to change some default va
 - `:args_header = "# Arguments:"`: Printed above the argument list of function
 - `:kwargs_header = nothing`: Printed above the keyword argument list of function
 - `:struct_fields_header = "# Fields:"`: Printed above the fields list of a struct
-- `:full_def = true`: Include the full function signature, if false, only include function and argument name
 - `:arg_types_in_desc = false`: Include the argument types in the description
 - `:defaults_in_desc = false`: Include the default values in the description
-
+- `:arg_types_in_header = false`: Include the argument types in the function header
+- `:defaults_in_header = false`: Include the default values in the function header
+- 
 You can always call `restore_defaults()` to restore the default options.
