@@ -4,10 +4,13 @@ using MacroTools
 export @autodoc, autodoc, restore_defaults
 
 options = Dict(
-:min_args => 3, # Minimum number of arguments to print the argument list
-:args_header => "# Arguments:", # Printed above the argument list
-:full_def => true, # Include the full function signature, if false, only include function and argument name
-:arg_types_in_desc => false, # Include the argument types in the description
+    :min_args => 3, # Minimum number of arguments to print the argument list
+    :args_header => "# Arguments:", # Printed above the argument list
+    :kwargs_header => nothing, # Printed above the keyword argument list
+    :struct_fields_header => "# Fields:", # Printed above the fields list
+    :full_def => true, # Include the full function signature, if false, only include function and argument name
+    :arg_types_in_desc => false, # Include the argument types in the description
+    :defaults_in_desc => false, # Include the default values in the description
 )
 
 const DEFAULT_OPTIONS = deepcopy(options)
@@ -22,7 +25,6 @@ macro autodoc()
         autodoc(file, li)
     end
 end
-
 
 function autodoc(file, li)
     docstring = generate_docstring(file,li)
@@ -49,87 +51,132 @@ function autodoc(file)
 end
 
 function generate_docstring(file,li)
-    fundef, argnames, argtypes = get_function_definition(file,li)
-    build_docstring(fundef, argnames, argtypes)
-end
-
-
-function get_function_definition(file,li)
     lines = readlines(file, keep=true)
     alllines = reduce(*, lines[li+1:end])
-
-    kwdef1 = occursin("@kwdef ", alllines[1:7])
-    kwdef2 = occursin("Base.@kwdef ", alllines[1:12])
-    kwdef1 && (alllines = alllines[8:end])
-    kwdef2 && (alllines = alllines[13:end])
-    kwdef = kwdef1 || kwdef2
-    
-
-    parsedlines = CSTParser.parse(alllines)
-    CSTParser.defines_function(parsedlines) ||
-        CSTParser.defines_struct(parsedlines) ||
-        error("I did not find a function or struct definition. Place `@autodoc` right above a function or struct definition. Line number: $li")
-    fundef0 = Meta.parse(alllines,1)[1]
-    fundef0 = rm_where(fundef0)
-    if kwdef || CSTParser.defines_struct(parsedlines)
-        args = fundef0.args[3].args
-        args = filter(x->x isa Expr, args)
-        return (fundef0.args[2]), (args), nothing
-    end
-    fundef = String(split(string(fundef0), '\n')[1])
-    fundef = strip_function_keyword(fundef)
-    fundef = replace(fundef, "; )" => ")")
-    argnames, argtypes = get_args(fundef0)
-    return fundef, argnames, argtypes
-end
-
-function rm_where(fundef)
-    try
-        sd = MacroTools.splitdef(fundef)
-        sd[:whereparams] = ()
-        return MacroTools.combinedef(sd)
-    catch
-        return fundef
-    end
+    build_docstring(alllines)
 end
 
 
-function get_args(fundef)
-    sd = MacroTools.splitdef(fundef)
-    args = String[]
-    argtypes = String[]
-    for arg in vcat(sd[:args], sd[:kwargs])
-        (arg_name, arg_type, is_splat, default) = MacroTools.splitarg(arg)
-        push!(args, string(arg_name))
-        push!(argtypes, string(arg_type))
+function remove_kwdef(str)
+    if occursin("@kwdef ", str[1:7])
+        return str[8:end], true
+    elseif occursin("Base.@kwdef ", str[1:12])
+        return str[13:end], true
+    else 
+        return str, false
     end
-    args, argtypes
 end
 
-function build_docstring(fundef, argnames, argtypes)
-    if options[:full_def]
-        if options[:arg_types_in_desc] && !isnothing(argtypes)
-            fundef = replace(fundef, r"(::.+?)([,|=| =])" => s"\2")
+function getfunstr(fundef)
+    str = "$(fundef[:name])("
+    if !isempty(fundef[:args])
+        str = str * (join(map(fundef[:args]) do f
+            get_arg_item_str(f, options[:full_def] && !options[:arg_types_in_desc], options[:full_def])
+        end,", "))
+    end
+    if !isempty(fundef[:kwargs])
+        str = str * "; " * (join(map(fundef[:kwargs]) do f
+            get_arg_item_str(f, options[:full_def] && !options[:arg_types_in_desc], options[:full_def])
+        end,", ")) 
+    end
+    str = str * ")"
+    return str
+end
+
+getArgName(e::Expr) = getArgName(e.args[1])
+getArgName(e::Symbol) = e
+
+function build_docstring(str)
+    cleaned_str, is_kwdef = remove_kwdef(str)
+    parsed = CSTParser.parse(cleaned_str)
+    mp = Meta.parse(cleaned_str,1)[1]
+    doc_str = if CSTParser.defines_function(parsed)
+        build_function_doc_string(mp)
+    elseif CSTParser.defines_struct(parsed)
+        build_struct_doc_string(mp, is_kwdef)
+    end
+    return doc_str
+end
+
+function build_function_doc_string(mp::Expr)
+    fundef = MacroTools.splitdef(mp)
+    str = """
+    \"\"\"
+        $(getfunstr(fundef))
+
+    DOCSTRING
+    """
+    if length(fundef[:args]) + length(fundef[:kwargs]) >= options[:min_args]
+        if !isempty(fundef[:args]) || !isempty(fundef[:kwargs])
+            str = str * "\n"
         end
-        str = "\"\"\"\n    $fundef\n\nDOCSTRING\n"
-    else
-        funname = split(fundef, '(')[1]
-        argstring = replace(string((string.(argnames)...,)), '"'=>"")
-        str = "\"\"\"\n    $(funname)$(argstring)\n\nDOCSTRING\n"
-    end
-    if !isempty(argnames) && length(argnames) >= options[:min_args]
-        str = string(str, "\n$(options[:args_header])\n")
-        for (i, argname) in enumerate(argnames)
-            argstr = if options[:arg_types_in_desc] && !isnothing(argtypes) && argtypes[i] != "Any"
-                "- `$argname::$(argtypes[i])`: DESCRIPTION\n"
-            else
-                "- `$argname`: DESCRIPTION\n"
-            end
-            str = string(str, argstr)
+        if !isempty(fundef[:args])
+            !isnothing(options[:args_header]) && (str = str * "$(options[:args_header])\n")
+            str = str * join(map(fundef[:args]) do f
+                "- `" * get_arg_item_str(f, options[:arg_types_in_desc], options[:defaults_in_desc]) * "`: DESCRIPTION"
+            end, "\n")
+        end
+        str = str * "\n"
+        if !isempty(fundef[:kwargs])
+            !isnothing(options[:kwargs_header]) && (str = str * "$(options[:kwargs_header])\n")
+            str = str * join(map(fundef[:kwargs]) do f
+                str = "- `" * get_arg_item_str(f, options[:arg_types_in_desc], options[:defaults_in_desc]) * "`: DESCRIPTION"
+            end, "\n")
+            str = str * "\n"
         end
     end
-    str = str*"\"\"\"\n"
-    str
+    str = str * "\"\"\"\n"
+end
+
+function get_arg_item_str(f, show_arg_types, show_defaults)
+    (arg_name, arg_type, is_splat, default) = MacroTools.splitarg(f)
+    str = "$arg_name"
+    if string(arg_type) != "Any" && show_arg_types
+        str = str * "::$arg_type"
+    end
+    if !isnothing(default) && show_defaults
+        if (default isa Expr && default.head == :call) || !(default isa Expr)
+            str = str * " = $default"
+        end
+    end
+    return str
+end
+
+function get_arg_item_str(f::Tuple, show_arg_types, show_defaults)
+    (arg_name, arg_type) = f
+    str = "$arg_name"
+    if string(arg_type) != "Any" && show_arg_types
+        str = str * "::$arg_type"
+    end
+    return str
+end
+
+function build_struct_doc_string(mp::Expr, is_kwdef::Bool)
+    structdef = MacroTools.splitstructdef(mp)
+    if is_kwdef
+        structdef[:fields] = filter(x->x isa Expr, mp.args[3].args)
+    end
+    str = """
+    \"\"\"
+        $(getstructstr(structdef))
+
+    DOCSTRING
+    """
+    if !isempty(structdef[:fields])
+        str = str * "\n# Fields:\n"
+        str = str * join(map(structdef[:fields]) do f
+            "- `" * get_arg_item_str(f, true, true) * "`: DESCRIPTION"
+        end, "\n")
+    end
+    str = str * "\n\"\"\"\n"
+end
+
+function getstructstr(structdef)
+    str = "$(structdef[:name])"
+    if !isempty(structdef[:params])
+        str = str * "{$(join(structdef[:params],", "))}"
+    end
+    return str
 end
 
 function save_backup(src)
@@ -149,10 +196,6 @@ function print_docstring(file, li, docstring)
     lines = readlines(file, keep=true)
     lines[li] = docstring
     printlines(file, lines)
-end
-
-function strip_function_keyword(fundef)
-    length(fundef) > 9 && fundef[1:8] == "function" ? fundef[10:end] : fundef
 end
 
 end # module

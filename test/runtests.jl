@@ -137,7 +137,7 @@ end
 """,
 """
 \"\"\"
-    f(a, b, c)
+    f(a, b; c)
 
 DOCSTRING
 
@@ -195,7 +195,7 @@ end
 
 DOCSTRING
 
-# Arguments:
+# Fields:
 - `simple_input::T1`: DESCRIPTION
 - `simple_result::T2`: DESCRIPTION
 - `result::T3`: DESCRIPTION
@@ -237,7 +237,7 @@ end
 
 DOCSTRING
 
-# Arguments:
+# Fields:
 - `simple_input::T1`: DESCRIPTION
 - `simple_result::T2`: DESCRIPTION
 - `result::T3`: DESCRIPTION
