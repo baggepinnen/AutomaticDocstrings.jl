@@ -285,5 +285,35 @@ function f(x::A, b=5; c = LinRange(1,2,10)) where A
 end
 """)
 
+restore_defaults()
+AutomaticDocstrings.options[:arg_types_in_desc] = true
+AutomaticDocstrings.options[:defaults_in_desc] = true
+AutomaticDocstrings.options[:arg_types_in_header] = false
+AutomaticDocstrings.options[:defaults_in_header] = false
+AutomaticDocstrings.options[:kwargs_header] = "# Keyword Arguments:"
+
+@test testdoc(
+"""
+@autodoc
+function f(x::A, b=5; c = LinRange(1,2,10)) where A
+    5
+end
+""",
+"""
+\"\"\"
+    f(x, b; c)
+
+DOCSTRING
+
+# Arguments:
+- `x::A`: DESCRIPTION
+- `b = 5`: DESCRIPTION
+# Keyword Arguments:
+- `c = LinRange(1, 2, 10)`: DESCRIPTION
+\"\"\"
+function f(x::A, b=5; c = LinRange(1,2,10)) where A
+    5
+end
+""")
 
 end
