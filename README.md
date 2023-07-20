@@ -44,11 +44,11 @@ If you don't like the docstring or if something went wrong, ctrl-z (undo) works 
 
 # VS code snippet
 Adding the following snippet to vscode makes it easy to insert an automatically generated docstring, just make sure to save the file before executing the `@autodoc` macro.
-```
-	"autodoc": {
-		"prefix": "autodoc",
-		"body": ["${1:@eval Main using AutomaticDocstrings}$2\n@eval Main @autodoc"],
-	},
+```json
+"autodoc": {
+	"prefix": "autodoc",
+	"body": ["${1:@eval Main using AutomaticDocstrings}$2\n@eval Main @autodoc"],
+},
 ```
 
 # Options
